@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Wrapper from '../../Helper/Wrapper';
 import Button from '../../UI/Button/Button';
 import Card from '../../UI/Card/Card';
@@ -7,45 +7,35 @@ import styles from './AddUser.module.css'
 
 const AddUser = props => {
 
-  const userData = {
-    username : '',
-    age : ''
-  }
-  const error = {}
-
-  const [userInput, setUserInput] = useState(userData)
+  const inputUserName = useRef()
+  const inputUserAge = useRef()
   const [isValid, setIsValid] = useState(false)
-  const [errorField, setErrorField] = useState('')
-
-  const onChangeHandler = event => {
-    setUserInput(prevState => {
-      return {...prevState, [event.target.name]: event.target.value }
-    })
-    if(errorField.indexOf(event.target.name) >= 0)
-      errorField.splice(errorField.indexOf(event.target.name), 1)
-  }
 
   const onFormSubmit = event => {
     event.preventDefault()
-    const check = Object.keys(userInput).filter(key => userInput[key] === null || userInput[key] === undefined || userInput[key] === "" || +userInput[key] < 1);
-    setErrorField(check)
-    if(check.length === 0) {
-      props.onAddUser(userInput)
-      setUserInput(userData)
-    }
-    else {
-      let errorLabel = ''
-      if(check.length === 1)
-        errorLabel = check.slice(0)
-      else
-        errorLabel = check.slice(0, -1).join(', ') + ', and ' + check.slice(-1)
-
-      error.title = 'Invalid input!'
-      error.message = 'Please enter valid input in ' + errorLabel + ' (non-empty value)'
-      if(!check.includes('username') && userInput['age'] !== '' && +userInput['age'] < 1) {
-        error.message = 'Please enter age < 0'
-      }
+    const userName = inputUserName.current.value
+    const userAge = inputUserAge.current.value
+    const error = {}
+    error.title = 'Invalid input!'
+    if(userName.trim().length === 0 && userAge.trim().length === 0)
+      error.message = 'Please enter valid input in username and age (non-empty value)'
+    else if(userName.trim().length === 0)
+      error.message = 'Please enter valid input in username (non-empty value)'
+    else if(userAge.trim().length === 0)
+      error.message = 'Please enter valid input in age (non-empty value)'
+    else if(+userAge < 1)
+      error.message = 'Please enter age greater than ' + userAge
+    
+    if(error.message && error.message.length > 0)
       setIsValid(error)
+    else {
+      const userInput = {
+        username : userName,
+        age : userAge
+      }
+      props.onAddUser(userInput)
+      inputUserName.current.value = ''
+      inputUserAge.current.value = ''
     }
   }
 
@@ -54,9 +44,9 @@ const AddUser = props => {
       <Card className={styles.input}>
         <form onSubmit={onFormSubmit}>
           <label>Username</label>
-          <input type="text" name='username' className={`${errorField.includes('username') && styles.invalid }`} value={userInput.username} onChange={onChangeHandler} />
+          <input type="text" name='username' ref={inputUserName} className={`${(inputUserName.current.value === '' && isValid) && styles.invalid} `} />
           <label>Age (Year)</label>
-          <input type="number" name='age' className={`${errorField.includes('age') && styles.invalid }`} value={userInput.age} onChange={onChangeHandler}/>
+          <input type="number" name='age' ref={inputUserAge} className={`${(inputUserAge.current.value === '' && isValid) && styles.invalid} `} />
 
           <Button>Add User</Button>
         </form>
