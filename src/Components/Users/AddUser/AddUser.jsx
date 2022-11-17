@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Wrapper from '../../Helper/Wrapper';
 import Button from '../../UI/Button/Button';
 import Card from '../../UI/Card/Card';
 import ErrorModel from '../../UI/ErrorModel/ErrorModel';
@@ -49,19 +50,19 @@ const AddUser = props => {
   }
 
   return (
-    <div>
-    <Card className={styles.input}>
-      <form onSubmit={onFormSubmit}>
-        <label>Username</label>
-        <input type="text" name='username' className={`${errorField.includes('username') && styles.invalid }`} value={userInput.username} onChange={onChangeHandler} />
-        <label>Age (Year)</label>
-        <input type="number" name='age' className={`${errorField.includes('age') && styles.invalid }`} value={userInput.age} onChange={onChangeHandler}/>
+    <Wrapper>
+      <Card className={styles.input}>
+        <form onSubmit={onFormSubmit}>
+          <label>Username</label>
+          <input type="text" name='username' className={`${errorField.includes('username') && styles.invalid }`} value={userInput.username} onChange={onChangeHandler} />
+          <label>Age (Year)</label>
+          <input type="number" name='age' className={`${errorField.includes('age') && styles.invalid }`} value={userInput.age} onChange={onChangeHandler}/>
 
-        <Button>Add User</Button>
-      </form>
-    </Card>
-    {isValid && <ErrorModel error={isValid} closeModel={setIsValid}/>}
-    </div>
+          <Button>Add User</Button>
+        </form>
+      </Card>
+      {isValid && <ErrorModel error={isValid} closeModel={setIsValid}/>}
+    </Wrapper>
   )
 }
 
